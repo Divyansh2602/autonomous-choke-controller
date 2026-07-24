@@ -1,0 +1,159 @@
+{
+  "problem": "3A -- Autonomous Production Choke Controller",
+  "sample_time_hr": 1.0,
+  "envelope": {
+    "WHP_min": 215.0,
+    "FLP_min": 150.0,
+    "BHP_min": 2850.0,
+    "choke_min": 0.0,
+    "choke_max": 100.0,
+    "max_ramp_pct_per_step": 5.0
+  },
+  "models": {
+    "Q": {
+      "a": 0.8237,
+      "gain_b1": 1.815,
+      "b0": 39.309,
+      "tau_hr": 5.15,
+      "noise_std": 0.742
+    },
+    "WHP": {
+      "a": 0.8892,
+      "gain_b1": -1.5857,
+      "b0": 319.387,
+      "tau_hr": 8.52,
+      "noise_std": 0.667
+    },
+    "FLP": {
+      "a": 0.8625,
+      "gain_b1": -0.9861,
+      "b0": 219.269,
+      "tau_hr": 6.76,
+      "noise_std": 0.522
+    },
+    "BHP": {
+      "a": 0.9257,
+      "gain_b1": -8.3832,
+      "b0": 3417.352,
+      "tau_hr": 12.96,
+      "noise_std": 2.949
+    }
+  },
+  "model_validation": {
+    "Q": {
+      "rmse": 1.061,
+      "rmse_pct_of_span": 1.545,
+      "max_abs_err": 2.939
+    },
+    "WHP": {
+      "rmse": 0.966,
+      "rmse_pct_of_span": 1.798,
+      "max_abs_err": 2.781
+    },
+    "FLP": {
+      "rmse": 0.847,
+      "rmse_pct_of_span": 2.414,
+      "max_abs_err": 2.22
+    },
+    "BHP": {
+      "rmse": 4.848,
+      "rmse_pct_of_span": 1.903,
+      "max_abs_err": 11.567
+    }
+  },
+  "hard_max_safe_rate_bbl_hr": 158.8,
+  "scenarios_mpc": {
+    "A": {
+      "scenario": "A",
+      "target_feasible": true,
+      "final_target_bbl_hr": 130.0,
+      "settled_oil_rate_bbl_hr": 129.89,
+      "settled_choke_pct": 50.0,
+      "steady_state_error_bbl_hr": -0.11,
+      "max_abs_tracking_error_bbl_hr": 40.0,
+      "violations_total": 0,
+      "violations_by_pressure": {
+        "WHP": 0,
+        "FLP": 0,
+        "BHP": 0
+      },
+      "min_pressures_psi": {
+        "WHP": 238.78,
+        "FLP": 168.81,
+        "BHP": 2992.18
+      },
+      "worst_pressure_margin_psi": 18.81
+    },
+    "B": {
+      "scenario": "B",
+      "target_feasible": true,
+      "final_target_bbl_hr": 150.0,
+      "settled_oil_rate_bbl_hr": 149.66,
+      "settled_choke_pct": 61.0,
+      "steady_state_error_bbl_hr": -0.34,
+      "max_abs_tracking_error_bbl_hr": 50.84,
+      "violations_total": 0,
+      "violations_by_pressure": {
+        "WHP": 0,
+        "FLP": 0,
+        "BHP": 0
+      },
+      "min_pressures_psi": {
+        "WHP": 221.93,
+        "FLP": 158.46,
+        "BHP": 2911.31
+      },
+      "worst_pressure_margin_psi": 6.93
+    },
+    "C": {
+      "scenario": "C",
+      "target_feasible": false,
+      "final_target_bbl_hr": 185.0,
+      "settled_oil_rate_bbl_hr": 154.85,
+      "settled_choke_pct": 63.95,
+      "steady_state_error_bbl_hr": -30.15,
+      "max_abs_tracking_error_bbl_hr": 95.0,
+      "violations_total": 0,
+      "violations_by_pressure": {
+        "WHP": 0,
+        "FLP": 0,
+        "BHP": 0
+      },
+      "min_pressures_psi": {
+        "WHP": 216.69,
+        "FLP": 155.0,
+        "BHP": 2880.97
+      },
+      "worst_pressure_margin_psi": 1.69
+    }
+  },
+  "scenarios_baseline": {
+    "A": {
+      "violations_total": 0,
+      "violations_by_pressure": {
+        "WHP": 0,
+        "FLP": 0,
+        "BHP": 0
+      },
+      "settled_oil_rate_bbl_hr": 130.12
+    },
+    "B": {
+      "violations_total": 0,
+      "violations_by_pressure": {
+        "WHP": 0,
+        "FLP": 0,
+        "BHP": 0
+      },
+      "settled_oil_rate_bbl_hr": 150.22
+    },
+    "C": {
+      "violations_total": 168,
+      "violations_by_pressure": {
+        "WHP": 57,
+        "FLP": 56,
+        "BHP": 55
+      },
+      "settled_oil_rate_bbl_hr": 184.68
+    }
+  }
+}
