@@ -1,5 +1,10 @@
 # Autonomous Production Choke Controller — Honeywell Hackathon (Problem 3A)
 
+> **Headline result: asked for an impossible 185 bbl/hr, the controller refuses
+> — 0 envelope violations while an envelope-unaware baseline racks up 168.**
+> It settles at the maximum safe rate instead. The controller knows when to
+> say no.
+
 An autonomous controller for a single naturally flowing oil well. Every 1-hour
 control interval it sets the production choke (0–100 %) to **track a target oil
 rate** while **never** violating the pressure operating envelope (lower bounds on
@@ -9,7 +14,8 @@ chasing it.
 
 The controller is **safe-by-construction**: it predicts the consequence of every
 candidate move with an identified dynamic model and rejects any move that would
-breach the envelope. It knows when to say no.
+breach the envelope — and a 22-case stress study (noise ×4, plant gains ±20 %,
+unmeasured disturbances) shows model error costs production, never safety.
 
 ## Results at a glance
 
@@ -36,6 +42,22 @@ This runs the full pipeline: loads the step-test data, identifies the models
 (printing gains and time constants), runs the three scenarios closed-loop, writes
 all plots and `metrics.json` to `results/`, and **asserts zero envelope
 violations** across A/B/C (the run fails loudly if that ever regresses).
+
+**Live dashboard** — run the controller interactively (scenario presets, a
+custom target slider, noise level, and per-step MPC diagnostics: candidates
+evaluated / rejected as unsafe / chosen Δchoke / WHP margin):
+
+```bash
+streamlit run app.py
+```
+
+**Robustness stress study** — 22 cases of noise scaling, ±20 % plant–model
+mismatch, and unmeasured disturbances (writes
+`results/robustness_metrics.json` + plots):
+
+```bash
+python robustness.py
+```
 
 The narrative walk-through is in
 [`notebook/choke_control_solution.ipynb`](notebook/choke_control_solution.ipynb),
@@ -105,6 +127,8 @@ edit only `envelope.py`.
 ├── plotting.py      # 6-trend scenario plots + model-validation plot
 ├── scenarios.py     # Scenario A/B/C runners + metrics
 ├── main.py          # runs everything; asserts 0 violations; writes results/
+├── app.py           # live Streamlit dashboard (streamlit run app.py)
+├── robustness.py    # 22-case stress study: noise, mismatch, disturbances
 ├── data/            # provided step-test CSV
 ├── results/         # generated PNGs + metrics.json
 ├── notebook/        # narrative Jupyter walk-through

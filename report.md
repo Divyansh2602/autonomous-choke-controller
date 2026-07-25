@@ -151,7 +151,41 @@ below the WHP floor for the entire run — 168 constraint breaches — to gain j
 ~30 bbl/hr of unsafe, unsustainable production. The safety-first controller gives
 that up by design. `results/baseline_comparison_C.png` shows the contrast.
 
-## 8. Lessons learned & limitations
+## 8. Robustness — stressing the controller beyond its model
+
+"Zero violations when the plant equals the model" is only half a claim, so we
+ran a 22-case stress study (`python robustness.py`, results in
+`results/robustness_metrics.json`) where the controller **keeps its identified
+model** while the true plant is altered:
+
+| Stress family | Cases | Violations | Outcome |
+|---|---|---|---|
+| Measurement noise 1× / 2× (3 seeds each) | 6 | **0** | margins absorb the scatter |
+| Measurement noise 4×, margin unaware | 3 | 2 (Scenario C, dips ≤ 2.2 psi) | see below |
+| Measurement noise 4×, margin sized to true noise | 3 | **0** | settles lower (143 vs 155 bbl/hr) |
+| Plant gains ±20 % (re-anchored at startup) | 6 | **0** | production sacrificed, never safety |
+| Stress: pressures 20 % steeper + dynamics 30 % slower | 3 | **0** | settles at 136 bbl/hr, margin 0.2 psi |
+| Unmeasured −8 psi WHP disturbance at t = 60 hr | 1 | **0** | recovers on feedback alone |
+
+Two findings worth stating honestly:
+
+- **Under model mismatch the controller fails in the right direction.** With
+  the true pressure gains 20 % steeper than the model believes, feedback pulls
+  the choke back as the measured WHP approaches the floor: the well settles at
+  a *lower* rate (135.8–156.8 bbl/hr depending on case) with **zero
+  violations**. Model error costs production, never safety.
+- **The safety margin is an explicit dial, and the one failure shows why.** At
+  4× the identified noise with the margin still sized for 1×, Scenario C
+  grazes the floor twice (≤ 2.2 psi). Re-sizing the margin to the true noise —
+  no logic change, the margin already scales with the controller's noise
+  estimate — restores zero violations at every noise level, trading ~12 bbl/hr
+  of throughput for it. That is the intended contract: uncertainty is paid for
+  in production, not in envelope breaches.
+
+`results/robustness_margins.png` shows the tightest margin per case;
+`results/robustness_disturbance.png` shows the disturbance recovery.
+
+## 9. Lessons learned & limitations
 
 - **The binding constraint is a lower pressure bound, not an upper rate bound** —
   recognising that inverted the intuition and made WHP the design driver.
@@ -170,11 +204,13 @@ that up by design. `results/baseline_comparison_C.png` shows the contrast.
   shares the official `.step()` signature, so the real simulator drops in with a
   one-line change, and the envelope is a single editable module.
 
-## 9. Reproducing
+## 10. Reproducing
 
 ```bash
 pip install -r requirements.txt
-python main.py     # prints model params, runs A/B/C, asserts 0 violations
+python main.py        # prints model params, runs A/B/C, asserts 0 violations
+python robustness.py  # 22-case stress study (noise, mismatch, disturbance)
+streamlit run app.py  # live dashboard: scenarios, per-step MPC diagnostics
 ```
 
 All figures and `metrics.json` are regenerated in `results/`. The narrative
