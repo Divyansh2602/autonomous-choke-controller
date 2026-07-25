@@ -34,6 +34,8 @@ breaches. Numbers are reproduced by `python main.py` and written to
 ## How to run
 
 ```bash
+git clone https://github.com/Divyansh2602/autonomous-choke-controller
+cd autonomous-choke-controller
 pip install -r requirements.txt
 python main.py
 ```
